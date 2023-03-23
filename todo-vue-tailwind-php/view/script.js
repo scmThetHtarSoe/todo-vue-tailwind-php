@@ -44,6 +44,7 @@ createApp({
           tasklistId: tasklistId,
         },
       });
+      this.leftLists = this.todos;
     },
     checkList(idx, index) {
       this.todos[index].status =
