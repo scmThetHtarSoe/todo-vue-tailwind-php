@@ -5,11 +5,22 @@ createApp({
       todos: [],
       newList: "",
       leftLists: [],
+      condition: "all",
     };
   },
   computed: {
     totalItem() {
       return this.leftLists.filter((data) => data.status != true).length;
+    },
+    items: function () {
+      switch (this.condition) {
+        case "all":
+          return this.todos;
+        case "active":
+          return this.todos.filter((data) => data.status != true);
+        case "inactive":
+          return this.todos.filter((data) => data.status == true);
+      }
     },
   },
   methods: {
@@ -35,7 +46,7 @@ createApp({
       this.leftLists = this.todos;
     },
     deleteList(index, idx) {
-      this.todos.splice(idx, 1);
+      this.todos = this.todos.filter((data) => data.uni_id != index);
       var tasklistId = index;
       $.ajax({
         url: "/api/delete.php",
@@ -46,9 +57,10 @@ createApp({
       });
       this.leftLists = this.todos;
     },
-    checkList(idx, index) {
-      this.todos[index].status =
-        this.todos[index].status == true ? false : true;
+    checkList(idx) {
+      this.todos.filter((data) => data.uni_id == idx).status == true
+        ? false
+        : true;
       $.ajax({
         url: "/api/updateStatus.php",
         method: "POST",
@@ -57,52 +69,6 @@ createApp({
         },
       });
       this.leftLists = this.todos;
-    },
-    showAll() {
-      this.todos = [];
-      this.todos = this.all();
-      this.leftLists = this.todos;
-    },
-    showActive() {
-      this.todos = [];
-      $active = this.todos;
-      $.ajax({
-        url: "/api/active.php",
-        type: "GET",
-        success: function (response) {
-          $allLists = response.data;
-          $allLists.forEach(function (val) {
-            this.$active.push({
-              id: val.id,
-              text: val.texts,
-              status: val.status,
-              uni_id: val.unquid_id,
-              showEditingbox: val.showEditingbox,
-            });
-          });
-        },
-      });
-      this.leftLists = this.todos;
-    },
-    showCompleted() {
-      this.todos = [];
-      $active = this.todos;
-      $.ajax({
-        url: "/api/completed.php",
-        type: "GET",
-        success: function (response) {
-          $allLists = response.data;
-          $allLists.forEach(function (val) {
-            this.$active.push({
-              id: val.id,
-              text: val.texts,
-              status: val.status,
-              uni_id: val.unquid_id,
-              showEditingbox: val.showEditingbox,
-            });
-          });
-        },
-      });
     },
     checkAll(el) {
       if (el.target.innerText == "Check All") {
@@ -154,8 +120,8 @@ createApp({
         url: "/api/allLists.php",
         type: "GET",
         success: function (response) {
-          $allLists = response.data;
-          $allLists.forEach(function (val) {
+          var allLists = response.data;
+          allLists.forEach(function (val) {
             getAllLists.push({
               id: val.id,
               text: val.texts,
@@ -170,18 +136,21 @@ createApp({
     },
   },
   created() {
-    $getAllLists = this.todos;
+    this.todos.forEach((todo) => {
+      todo.status = false;
+    });
+    var getAllLists = this.todos;
 
     $.ajax({
       url: "/api/allLists.php",
       type: "GET",
       success: function (response) {
-        $allLists = response.data;
-        $allLists.forEach(function (val) {
-          this.$getAllLists.push({
+        var allLists = response.data;
+        allLists.forEach(function (val) {
+          getAllLists.push({
             id: val.id,
             text: val.texts,
-            status: val.status,
+            status: Boolean(val.status),
             uni_id: val.unquid_id,
             showEditingbox: val.showEditingbox,
           });

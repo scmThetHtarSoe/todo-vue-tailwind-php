@@ -27,20 +27,20 @@ include_once("api/createTable.php");
             </form>
 
             <div class="flex">
-                <button type="button" id="all" class="flex-1 border border-gray-200 px-12 py-2" @click="showAll()">
+                <button type="button" id="all" class="flex-1 border border-gray-200 px-12 py-2" @click="condition = 'all'">
                     All
                 </button>
-                <button type="button" id="notdone" class="flex-1 border border-gray-200 px-12 py-2 mx-2" @click="showActive()">
+                <button type="button" id="notdone" class="flex-1 border border-gray-200 px-12 py-2 mx-2" @click="condition = 'active'">
                     Active
                 </button>
-                <button type="button" id="done" class="flex-1 border border-gray-200 px-8 py-2" @click="showCompleted()">
+                <button type="button" id="done" class="flex-1 border border-gray-200 px-8 py-2" @click="condition = 'inactive'">
                     Completed
                 </button>
             </div>
 
             <ul class="my-4 list-none list-group" id="list-group">
-                <li v-for="(todo,index) in todos" class="bg-gray-200 text-black py-2.5 px-5 border-b-2 border-neutral-100 flex items-center">
-                    <input type="checkbox" v-model="todo.status" @click="checkList(todo.uni_id,index)" :checked="todo.status = todo.status==1 ? true : false " />
+                <li v-for="(todo,index) in items" :key="todo.uni_id" class="bg-gray-200 text-black py-2.5 px-5 border-b-2 border-neutral-100 flex items-center">
+                    <input type="checkbox" :id="todo.uni_id" :checked="todo.status = todo.status==true?true:false" v-model="todo.status" @click="checkList(todo.uni_id)" />
 
                     <div v-show="todo.showEditingbox == false">
                         <span :class="todo.status? 'line-through ml-4' : 'ml-4'" @dblclick="todo.showEditingbox = true;showAutofocus(index)">{{ todo.text }}</span>
@@ -56,7 +56,6 @@ include_once("api/createTable.php");
             </p>
             <div class="flex mt-4">
                 <button type="button" id="checkAll" class="flex-1 border border-gray-200 px-8 py-2 mr-4" v-text="totalItem==0 && todos.length>0?'Uncheck All':'Check All'" @click="checkAll($event)">
-                    Check All
                 </button>
                 <button type="button" id="cleardone" class="flex-1 border border-gray-200 px-8 py-2" @click="clearCompleted()">
                     Clear Completed
