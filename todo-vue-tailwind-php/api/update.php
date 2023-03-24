@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         $data_texts =  $getOldTexts;
     }
 
-    if (!empty($data_texts) && !empty($id)) {
+    if (isset($data_texts) && !empty($id)) {
         $lists->texts = $data_texts;
         $lists->unquid_id =  $id;
         if ($lists->update_list()) {
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         http_response_code(404); //503 services unavailable
         echo json_encode([
             "status" => 0,
-            "message" => "Lists needed"
+            "message" => "Lists needed",
         ]);
     }
 } else {
